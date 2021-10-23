@@ -12,14 +12,14 @@ final class websocketTests: XCTestCase {
       // Start webserver. Wait for it to be ready. We will create a proper ready flag.
       let server = try BKWebSocketServer()
       RunLoop.current.run(until: Date.init(timeIntervalSinceNow: 1))
-        
-      let task = URLSession.shared.webSocketTask(with: URL(string: "ws://localhost:8000")!)
+
+        wait(for: [expectation], timeout: 5000.0)
+
+      let task = URLSession.shared.webSocketTask(with: URL(string: "wss://localhost:8000")!)
       task.resume()
 
         task.send(.string(message)) { error in if let error = error { XCTFail("\(error)") } }
       task.receive { result in
-          expectation.fulfill()
-
           switch result {
           case .success(let result):
               var msg: String? = nil
@@ -35,8 +35,9 @@ final class websocketTests: XCTestCase {
           case .failure(let error):
               XCTFail("\(error)")
           }
+          expectation.fulfill()
       }
 
-      wait(for: [expectation], timeout: 2.0)
+      wait(for: [expectation], timeout: 5.0)
     }
 }
